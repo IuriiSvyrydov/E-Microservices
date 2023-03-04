@@ -1,0 +1,11 @@
+version: '3.4'
+
+services:
+  sourcingdb:
+    image: mongo
+
+  services.product:
+    image: ${DOCKER_REGISTRY-}servicesproduct
+    build:
+      context: .
+      dockerfile: src/Services/Products/Services.Product/Dockerfile
