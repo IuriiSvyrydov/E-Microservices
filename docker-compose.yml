@@ -1,0 +1,20 @@
+version: '3.4'
+
+services:
+  sourcingdb:
+    image: mongo
+
+  rabbitmq:
+    image: rabbitmq:3-management
+  services.product:
+    image: ${DOCKER_REGISTRY-}servicesproduct
+    build:
+      context: .
+      dockerfile: src/Services/Products/Services.Product/Dockerfile
+
+  e-microservices.source:
+    image: ${DOCKER_REGISTRY-}emicroservicessource
+    build:
+      context: .
+      dockerfile: src/Services/Source/E-Microservices.Source/Dockerfile
+

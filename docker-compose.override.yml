@@ -1,0 +1,49 @@
+version: '3.4'
+
+services:
+  sourcingdb:
+    container_name: sourcingdb
+    restart: always
+    volumes:
+     - ${WEAPP_STORAGE_HOME}/site:/data/db 
+     #- ./data:/data/db
+    ports:
+     - "27017:27017" 
+  rabbitmq:
+    container_name: rabbitmq
+    restart: always
+    ports:
+       - "5672:5672"
+       - "15672:15672"
+  services.product:
+    container_name: serviceProduct
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      #- ASPNETCORE_URLS=https://+:443;http://+:80
+      - "ProductDatabaseSettings:dockerConnectionStrings=mongodb://sourcingdb:27017"
+    depends_on:
+      - sourcingdb 
+    volumes:
+      - ${HOME}/.Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${HOME}/.ASP.NET/Https:/root/.aspnet/https:ro
+    ports:
+      - "8000:80"
+
+  e-microservices.source:
+    container_name: sourcingservice
+    
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - "SourcingDatabaseSettings:ConnectionString=mongodb://localhost:27017"
+      - "EventBus:HostName=rabbitmq"
+      #- "EventBus:UserName=guest"
+      #- "EventBus:Password=guest"
+    depends_on:
+      - sourcingdb  
+      - rabbitmq
+    volumes:
+      - ${HOME}/.Microsoft/UserSecrets:/root/.microsoft/usersecrets
+      - ${HOME}/.ASP.NET/Https:/root/.aspnet/https/
+    ports:
+      - "8001:80"
+
